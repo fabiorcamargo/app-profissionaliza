@@ -10,7 +10,6 @@ git clone https://github.com/fabiorcamargo/profissionalizaead-laravel9.git my-pr
 cd my-project/
 ```
 
-
 Alterne para a branch laravel 9.x
 ```sh
 git checkout laravel-9-com-php-8
