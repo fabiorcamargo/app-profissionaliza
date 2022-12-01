@@ -9,17 +9,19 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    protected $model;
+    public function __construct(User $user)
+    {
+        $this->model = $user;
+    }
     public function index(Request $request)
     {
         $search = $request->search;
         //$users = User::where('name', 'LIKE', "%{$request->search}%")->get();
-        $users = User::where(function ($query) use ($search) {
-            if ($search) {
-                $query->where('email', 'LIKE', "%{$search}%");
-                $query->orWhere('name', 'LIKE', "%{$search}%");
-            }
-
-        })->get();
+        $users = $this->model
+                        ->getUsers(
+                            search: $request->search ?? ''
+                        );
 
         return view('users.index', compact('users'));
     }
@@ -46,7 +48,7 @@ class UserController extends Controller
 
         $data = $request->all();
         $data['password'] = bcrypt($request->password);
-        $user = User::create($data);
+        $user = $this->model->create($data);
 
         //return redirect()->route('users.show', $user->id);
         return redirect()->route('users.index');
@@ -54,7 +56,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        if (!$user = User::find($id))
+        if (!$user = $this->model->find($id))
             return redirect()->route('users.index');
         return view('users.edit', compact('user'));
     }
@@ -74,7 +76,7 @@ class UserController extends Controller
     public function destroy($id)
     {
        // $user = User::where('id', $id)->first();
-        if (!$user = User::find($id))
+        if (!$user = $this->model->find($id))
             return redirect()->route('users.index');
 
         $user->delete();
